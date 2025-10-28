@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supabase Auth Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-sm text-center">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Welcome</h2>
+    <input id="email" type="email" placeholder="Email"
+      class="w-full p-3 mb-3 border rounded-lg focus:ring-2 focus:ring-blue-400" />
+    <input id="password" type="password" placeholder="Password"
+      class="w-full p-3 mb-5 border rounded-lg focus:ring-2 focus:ring-blue-400" />
+
+    <div class="flex justify-between">
+      <button id="signup"
+        class="w-[48%] bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">Sign Up</button>
+      <button id="login"
+        class="w-[48%] bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition">Login</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+</body>
+</html>

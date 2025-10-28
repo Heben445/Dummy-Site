@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Save Card</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
+  <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-lg">
+    <h1 class="text-2xl font-semibold mb-4 text-gray-800 text-center">💳 Save Credit Card (Demo)</h1>
+
+    <form id="cardForm" class="space-y-3 mb-6">
+      <input id="cardName" type="text" placeholder="Name on Card"
+        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400" required>
+      <input id="cardNumber" type="text" placeholder="Card Number (Sample)"
+        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400" required>
+      <input id="expiryDate" type="text" placeholder="MM/YY"
+        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400" required>
+
+      <button type="submit"
+        class="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition">
+        Save Card
+      </button>
+    </form>
+
+    <h2 class="text-lg font-semibold mb-3 text-gray-700">Your Saved Cards</h2>
+    <ul id="cardsList" class="space-y-2 bg-gray-50 p-3 rounded-lg"></ul>
+
+    <button id="logout"
+      class="mt-6 w-full bg-red-500 text-white p-3 rounded-lg hover:bg-red-600 transition">
+      Logout
+    </button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <script>
+    checkUser();
+    loadCards();
+
+    const form = document.getElementById("cardForm");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("cardName").value;
+      const number = document.getElementById("cardNumber").value;
+      const expiry = document.getElementById("expiryDate").value;
+
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      const user_id = session.user.id;
+      const last4 = number.slice(-4);
+
+      const { error } = await supabaseClient.from("cards").insert([
+        {
+          user_id,
+          card_name: name,
+          card_number: `**** **** **** ${last4}`,
+          expiry_date: expiry,
+        },
+      ]);
+
+      if (error) alert(error.message);
+      else {
+        form.reset();
+        loadCards();
+      }
+    });
+
+    async function loadCards() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      const { data, error } = await supabaseClient
+        .from("cards")
+        .select("*")
+        .eq("user_id", session.user.id);
+
+      const list = document.getElementById("cardsList");
+      list.innerHTML = "";
+      if (error) return alert(error.message);
+
+      data.forEach(card => {
+        const li = document.createElement("li");
+        li.className = "p-3 bg-white rounded-lg shadow-sm flex justify-between items-center";
+        li.innerHTML = `
+          <span>${card.card_name} — ${card.card_number} (exp ${card.expiry_date})</span>
+        `;
+        list.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
